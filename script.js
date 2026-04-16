@@ -37,6 +37,27 @@ const SER_IMAGE = "ser.jpg";
 const PROMO_CODE = "OVCHINNIKOV";
 const PROMO_DISCOUNT = 0.2;
 
+function showNotification(text, isError = false) {
+  const notification = document.getElementById("notification");
+  if (!notification) return;
+
+  notification.textContent = text;
+  notification.classList.remove("error");
+  notification.classList.remove("show");
+
+  if (isError) {
+    notification.classList.add("error");
+  }
+
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 3000);
+}
+
 function saveCart() {
   localStorage.setItem("kunikCart", JSON.stringify(cart));
   localStorage.setItem("kunikPromo", appliedPromo);
@@ -252,6 +273,7 @@ function addSimpleProduct(name, price, image) {
 
   renderCart();
   openCart();
+  showNotification("Добавлено в корзину");
 }
 
 function addSerProductWithOption() {
@@ -275,6 +297,7 @@ function addSerProductWithOption() {
   renderCart();
   closeSerModal();
   openCart();
+  showNotification("Добавлено в корзину");
 }
 
 addButtons.forEach((button) => {
@@ -294,10 +317,12 @@ if (applyPromoBtn) {
       appliedPromo = PROMO_CODE;
       promoMessage.textContent = "Промокод применён: скидка 20%";
       promoMessage.style.color = "#1a8f3c";
+      showNotification("Промокод применён");
     } else {
       appliedPromo = "";
       promoMessage.textContent = "Неверный промокод";
       promoMessage.style.color = "#d33";
+      showNotification("Неверный промокод", true);
     }
 
     renderCart();
@@ -313,13 +338,14 @@ if (clearCartBtn) {
       promoMessage.style.color = "#666";
     }
     renderCart();
+    showNotification("Корзина очищена");
   });
 }
 
 if (sendOrderBtn) {
   sendOrderBtn.addEventListener("click", async () => {
     if (cart.length === 0) {
-      showNotification("Корзина пуста",true);
+      showNotification("Корзина пуста", true);
       return;
     }
 
@@ -349,7 +375,7 @@ if (sendOrderBtn) {
       if (data.ok) {
         showNotification("Заказ отправлен 🚀");
       } else {
-        showNotification("Ошибка: " + (data.error || "неизвестная ошибка",true));
+        showNotification("Ошибка: " + (data.error || "неизвестная ошибка"), true);
       }
     } catch (error) {
       console.error(error);
